@@ -60,10 +60,16 @@ public class ReporterLogAppender extends AppenderBase<ILoggingEvent> {
             throw new RuntimeException(e);
         }
         this.threadName = Thread.currentThread().getName();
-        this.logger = (Logger) LoggerFactory.getLogger("com.intuit.karate");
-        setName("karate-reporter");
-        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-        setContext(lc);
+        LoggerContext ctx = null;
+		if (!(LoggerFactory.getILoggerFactory()
+				.getLogger("com.intuit.karate") instanceof ch.qos.logback.classic.Logger)) {
+			ctx = new LoggerContext();
+		} else {
+			ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
+		}
+		this.logger = ctx.getLogger("com.intuit.karate");
+		setName("karate-reporter");
+		setContext(ctx);
         encoder = new PatternLayoutEncoder();
         encoder.setPattern("%d{HH:mm:ss.SSS} %-5level - %msg%n");
         encoder.setContext(context);
